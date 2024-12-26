@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 include 'db_connection.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -48,20 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         .navbar-brand {
-            color: #c5a992 !important;
+            color: black !important;
         }
 
         .navbar-nav .nav-link {
-            color: #fff !important;
+            color: black !important;
         }
 
         .hover-icon:hover {
-            color: #c5a992;
+            color:black;
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-sm fixed-top">
+<nav class="navbar navbar-expand-sm fixed-top bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#"><b>Book</b>Hives</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="index.php">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="shop.php">Shop</a>
@@ -79,16 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <a class="nav-link" href="#">Features</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">About</a>
+          <a class="nav-link" href="about.php">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Contact</a>
+          <a class="nav-link" href="contact.php">Contact</a>
         </li>
       </ul>
       <div class="d-flex">
-        <i class="bi bi-search margin-right-6 me-4 hover-icon"></i>
-        <i class="bi bi-cart3 margin-right-6 me-4 hover-icon"></i>
-        <a href="user_signup.php"><i class="bi bi-person-circle margin-right-6 me-4 hover-icon"> </i> </a>
+      <a href="seller/seller_dashboard.php "><i class="bi bi-coin margin-right-6 me-4 hover-icon"></i></a>
+      <a href="user_purchases.php"><i class="bi bi-bag-fill  margin-right-6 me-4 hover-icon"></i></a>
+            <!-- <a href="user_signup.php"><i class="bi bi-person-circle margin-right-6 me-4 hover-icon  "> </i> </a>      -->
+        <a href="user_signup.php"><i class="bi bi-person-circle margin-right-6 me-4 hover-icon  "> </i> </a>     
+
       </div>
     </div>
   </div>
@@ -123,49 +125,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
 </div>
-<!-- footer -->
-<footer class="bg-dark text-center text-lg-start mt-4">
-  <div class="container p-4">
-    <div class="row">
-      <div class="col-lg-6 col-md-12 mb-4">
-        <h5 class="text-uppercase text-light">About Us</h5>
-        <p class="text-light">
-          We are a company dedicated to providing the best services to our customers. Our mission is to deliver quality and excellence in everything we do.
-        </p>
-      </div>
 
-      <div class="col-lg-3 col-md-6 mb-4 text-light">
-        <h5 class="text-uppercase">Links</h5>
-        <ul class="list-unstyled">
-          <li>
-            <a href="#" class="text-light">Home</a>
-          </li>
-          <li>
-            <a href="#" class="text-light">Features</a>
-          </li>
-          <li>
-            <a href="#" class="text-light">Contact</a>
-          </li>
-          <li>
-            <a href="#" class="text-light">Privacy Policy</a>
-          </li>
-        </ul>
-      </div>
-
-      <div class="col-lg-3 col-md-6 mb-4 text-light">
-        <h5 class="text-uppercase ">Follow Us</h5>
-        <a href="#" class="text-light me-3 "><i class="bi bi-facebook  hover-icon"></i></a>
-        <a href="#" class="text-light me-3"><i class="bi bi-twitter hover-icon"></i></a>
-        <a href="#" class="text-light me-3"><i class="bi bi-instagram hover-icon"></i></a>
-        <a href="#" class="text-light"><i class="bi bi-linkedin hover-icon"></i></a>
-      </div>
-    </div>
-  </div>
-
-  <div class="text-center p-3 bg-light">
-    © 2024 <b>Book</b>Hives. All rights reserved.
-  </div>
-</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html> -->
+<?php
+session_start();
+include 'db_connection.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $query = "SELECT user_id, password FROM users WHERE username = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['user_id'];
+            header('Location: books.php');
+            exit;
+        } else {
+            $error = "Invalid password.";
+        }
+    } else {
+        $error = "Invalid username.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <?php if (isset($error)) echo "<p style='color: red;'>$error</p>"; ?>
+    <form method="POST" action="">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>
+

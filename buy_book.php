@@ -3,14 +3,20 @@ session_start();
 include 'db_connection.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: user_login.php");
+    header('Location: login.php');
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
-$book_id = $_GET['book_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id'];
+    $book_id = $_POST['book_id'];
 
-$query = "INSERT INTO purchases (user_id, book_id) VALUES ('$user_id', '$book_id')";
-mysqli_query($conn, $query);
-header("Location: user_orders.php");
+    $query = "INSERT INTO purchases (user_id, book_id) VALUES (?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('ii', $user_id, $book_id);
+    $stmt->execute();
+
+    header('Location: purchases.php');
+    exit;
+}
 ?>
